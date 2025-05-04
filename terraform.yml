@@ -1,1 +1,46 @@
+name: "Terraform Deployment - Dev"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'environment/dev/**'
+      - 'module/**'
+
+jobs:
+  terraform:
+    name: "Terraform Apply Dev"
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: environment/dev
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -var-file="terraform.tfvars"
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -var-file="terraform.tfvars"
 
