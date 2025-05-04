@@ -3,10 +3,10 @@ name: "Terraform Deployment - Dev"
 on:
   push:
     branches:
-      - main
-    paths:
-      - 'environment/dev/**'
-      - 'module/**'
+      - '**'
+  pull_request:
+    branches:
+      - '**'
 
 jobs:
   terraform:
